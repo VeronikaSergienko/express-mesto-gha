@@ -4,7 +4,7 @@ const User = require('../models/user');
 module.exports.getUser = (req, res) => {
   // найти вообще всех
   User.find({})
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.status(200).send(user))
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
@@ -14,13 +14,13 @@ module.exports.postUser = (req, res) => {
   // создадим документ на основе пришедших данных
   User.create({ name, about, avatar })
   /* напишите код здесь */
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.status(200).send({ data: user }))
   // данные не записались, вернём ошибку
     .catch((err) => res.status(500).send(err));
 };
 
 module.exports.getUserId = (req, res) => {
   User.findById(req.params.id)
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.status(200).send({ data: user }))
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
