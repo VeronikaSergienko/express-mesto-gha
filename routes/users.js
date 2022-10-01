@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const User = require('../models/user');
+const { postUser, getUser, getUserId } = require('../controllers/users');
 
 // GET /users — возвращает всех пользователей
 // router.get("/users", )
@@ -8,29 +8,14 @@ const User = require('../models/user');
 
 // POST /users — создаёт пользователя
 
-router.get('/users', (req, res) => {
-  // найти вообще всех
-  User.find({})
-    .then(user => res.send({ data: user }))
-    .catch(err => res.status(500).send({ message: 'Произошла ошибка' }));
-});
+// PATCH /users/me — обновляет профиль
+// PATCH /users/me/avatar — обновляет аватар
 
-router.get('/users/:userId', (req, res) => {
-  User.findById(req.params.id)
-    .then(user => res.send({ data: user }))
-    .catch(err => res.status(500).send({ message: 'Произошла ошибка' }));
-});
+router.get('/users', getUser);
 
-// сработает при POST-запросе на URL /films
-router.post('/users', (req, res) => {
-  // получим из объекта запроса имя и описание пользователя
-  const { name, about, avatar } = req.body;
-  // создадим документ на основе пришедших данных
-  User.create({ name, about, avatar })
-  /* напишите код здесь */
-    .then(user => res.send({ data: user }))
-    // данные не записались, вернём ошибку
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
-});
+router.get('/users/:userId', getUserId);
+
+// сработает при POST-запросе на URL /users
+router.post('/users', postUser);
 
 module.exports = router;

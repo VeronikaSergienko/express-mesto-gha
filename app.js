@@ -10,9 +10,11 @@ app.use(bodyParser.urlencoded({
   extended: true,
 }));
 
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.use((req, res, next) => {
   req.user = {
-    _id: '',
+    _id: '6337fd0ac1b43913c233dd10',
   };
   next();
 });
