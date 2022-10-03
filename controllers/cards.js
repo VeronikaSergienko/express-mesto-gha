@@ -1,23 +1,23 @@
 /* eslint-disable no-param-reassign, no-underscore-dangle */
 const Cards = require('../models/card');
 
-module.exports.getCard = (req, res) => {
-  // найти вообще всех
+const getCard = (req, res) => {
   Cards.find({})
-    .then((cards) => res.send({ data: cards }))
+    .then((cards) => res.status(200).send({ data: cards }))
     .catch(() => res.status(500).send({ message: 'Произошла ошибка при запросе всех карточек' }));
 };
 
-module.exports.createCard = (req, res) => {
-  // получим из объекта запроса имя и описание пользователя
+const createCard = (req, res) => {
   const { name, link } = req.body;
-  const ownerId = res.user._id;
-  // console.log(req.user._id); // _id станет доступен
-  // создадим документ на основе пришедших данных
+  const ownerId = req.user._id;
   Cards.create({ name, link, owner: ownerId })
-  /* напишите код здесь */
-    .then((card) => res.send({ data: card }))
-    // данные не записались, вернём ошибку
+    .then((card) => res.status(200).send({ data: card }))
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+};
+
+const deleteCard = (req, res) => {
+  Cards.findByIdAndRemove(req.params.cardId)
+    .then((card) => res.status(200).send({ data: card }))
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
@@ -32,3 +32,5 @@ module.exports.createCard = (req, res) => {
 //   { $pull: { likes: req.user._id } }, // убрать _id из массива
 //   { new: true },
 // );
+
+module.exports = { getCard, createCard, deleteCard };

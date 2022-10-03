@@ -23,10 +23,10 @@ app.use((req, res, next) => {
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.use('/users', require('./routes/users'));
-app.use('./cards', require('./routes/cards'));
+app.use('/cards', require('./routes/cards'));
 
-// app.use('/*', (req, res) => {
-//   res.status(404).json({ message: 'Запрашиваемый ресурс не найден' });
-// });
+app.use('/*', (req, res) => {
+  res.status(404).json({ message: 'Запрашиваемый ресурс не найден' });
+});
 
 app.listen(PORT);
