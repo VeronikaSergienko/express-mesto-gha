@@ -1,8 +1,6 @@
 /* eslint-disable no-param-reassign, no-underscore-dangle */
 const User = require('../models/user');
 
-
-
 // GET /users — возвращает всех пользователей
 const getUser = (req, res) => {
   User.find({})
@@ -46,4 +44,6 @@ const patchUserAvatar = (req, res) => {
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
-module.exports = { getUser, createUser, getUserId, patchUserId, patchUserAvatar };
+module.exports = {
+  getUser, createUser, getUserId, patchUserId, patchUserAvatar,
+};
