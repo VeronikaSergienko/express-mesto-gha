@@ -45,7 +45,7 @@ const getUserId = (req, res) => {
 const patchUserId = (req, res) => {
   const { name, about, avatar } = req.body;
   const ownerId = req.user._id;
-  User.findByIdAndUpdate(ownerId, { name, about, avatar })
+  User.findByIdAndUpdate(ownerId, { name, about, avatar }, { new: true, runValidators: true })
     .orFail(new NotFound('Пользователь не найден'))
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
@@ -63,7 +63,7 @@ const patchUserId = (req, res) => {
 const patchUserAvatar = (req, res) => {
   const newAvatar = req.body.avatar;
   const ownerId = req.user._id;
-  User.findByIdAndUpdate(ownerId, { avatar: newAvatar })
+  User.findByIdAndUpdate(ownerId, { avatar: newAvatar }, { new: true, runValidators: true })
     .orFail(new NotFound('Пользователь не найден'))
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
