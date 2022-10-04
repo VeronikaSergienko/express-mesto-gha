@@ -20,7 +20,7 @@ const createUser = (req, res) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
       } else {
-        res.status(500).send({ message: 'Ошибка по-умолчанию' });
+        res.status(500).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
@@ -36,7 +36,7 @@ const getUserId = (req, res) => {
       } else if (!!err.status && err.status === 404) {
         res.status(err.status).send({ message: err.message });
       } else {
-        res.status(500).send({ message: 'Ошибка по-умолчанию' });
+        res.status(500).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
@@ -54,7 +54,7 @@ const patchUserId = (req, res) => {
       } else if (err.name === 'CastError') {
         res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
       } else {
-        res.status(500).send({ message: 'Ошибка по-умолчанию' });
+        res.status(500).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
@@ -72,7 +72,7 @@ const patchUserAvatar = (req, res) => {
       } else if (err.name === 'CastError') {
         res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
       } else {
-        res.status(500).send({ message: 'Ошибка по-умолчанию' });
+        res.status(500).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
