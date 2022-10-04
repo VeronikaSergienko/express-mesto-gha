@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign, no-underscore-dangle */
 const Cards = require('../models/card');
+const NotFound = require('../errors/NotFound');
 
 // GET /cards — возвращает все карточки
 const getCard = (req, res) => {
@@ -14,14 +15,20 @@ const createCard = (req, res) => {
   const ownerId = req.user._id;
   Cards.create({ name, link, owner: ownerId })
     .then((card) => res.status(200).send({ data: card }))
-    .catch(() => res.status(500).send({ message: 'Ошибка по-умолчанию' }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Переданы некорректные данные при создании карточки' });
+      } else {
+        res.status(500).send({ message: 'Ошибка по-умолчанию' });
+      }
+    });
 };
 
 // DELETE /cards/:cardId — удаляет карточку по идентификатору
 const deleteCard = (req, res) => {
   Cards.findByIdAndRemove(req.params.cardId)
     .then((card) => res.status(200).send({ data: card }))
-    .catch(() => res.status(400).send({ message: 'Карточка с указанным _id не найдена.' }));
+    .catch(() => res.status(404).send({ message: 'Карточка с указанным _id не найдена.' }));
 };
 
 // PUT /cards/:cardId/likes — поставить лайк карточке
@@ -31,8 +38,17 @@ const likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
     { new: true },
   )
+    .orFail(new NotFound('Переданы некорректные данные для постановки лайка.'))
     .then((card) => res.status(200).send({ data: card }))
-    .catch(() => res.status(500).send({ message: 'Ошибка по-умолчанию' }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
+      } else if (!!err.status && err.status === 404) {
+        res.status(err.status).send({ message: err.message });
+      } else {
+        res.status(500).send({ message: 'Ошибка по-умолчанию' });
+      }
+    });
 };
 
 // DELETE /cards/:cardId/likes — убрать лайк с карточки

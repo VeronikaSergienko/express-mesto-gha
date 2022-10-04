@@ -16,8 +16,6 @@ const createUser = (req, res) => {
   // создадим документ на основе пришедших данных
   User.create({ name, about, avatar })
     .then((user) => res.status(200).send({ data: user }))
-  // данные не записались, вернём ошибку
-    // .catch((err) => res.status(500).send(err));
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
@@ -34,7 +32,7 @@ const getUserId = (req, res) => {
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Пользователь по указанному _id не найден' });
+        res.status(404).send({ message: 'Пользователь по указанному _id не найден' });
       } else if (!!err.status && err.status === 404) {
         res.status(err.status).send({ message: err.message });
       } else {
@@ -52,9 +50,9 @@ const patchUserId = (req, res) => {
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+        res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
       } else if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Пользователь по указанному _id не найден' });
+        res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
       } else {
         res.status(500).send({ message: 'Ошибка по-умолчанию' });
       }
@@ -70,9 +68,9 @@ const patchUserAvatar = (req, res) => {
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+        res.status(400).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
       } else if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Пользователь по указанному _id не найден' });
+        res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
       } else {
         res.status(500).send({ message: 'Ошибка по-умолчанию' });
       }
