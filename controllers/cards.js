@@ -5,7 +5,7 @@ const Cards = require('../models/card');
 const getCard = (req, res) => {
   Cards.find({})
     .then((cards) => res.status(200).send({ data: cards }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка при запросе всех карточек' }));
+    .catch(() => res.status(500).send({ message: 'Ошибка по-умолчанию' }));
 };
 
 // POST /cards — создаёт карточку
@@ -14,14 +14,14 @@ const createCard = (req, res) => {
   const ownerId = req.user._id;
   Cards.create({ name, link, owner: ownerId })
     .then((card) => res.status(200).send({ data: card }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(() => res.status(500).send({ message: 'Ошибка по-умолчанию' }));
 };
 
 // DELETE /cards/:cardId — удаляет карточку по идентификатору
 const deleteCard = (req, res) => {
   Cards.findByIdAndRemove(req.params.cardId)
     .then((card) => res.status(200).send({ data: card }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(() => res.status(400).send({ message: 'Карточка с указанным _id не найдена.' }));
 };
 
 // PUT /cards/:cardId/likes — поставить лайк карточке
@@ -32,7 +32,7 @@ const likeCard = (req, res) => {
     { new: true },
   )
     .then((card) => res.status(200).send({ data: card }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(() => res.status(500).send({ message: 'Ошибка по-умолчанию' }));
 };
 
 // DELETE /cards/:cardId/likes — убрать лайк с карточки
@@ -43,7 +43,7 @@ const dislikeCard = (req, res) => {
     { new: true },
   )
     .then((card) => res.status(200).send({ data: card }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(() => res.status(500).send({ message: 'Ошибка по-умолчанию' }));
 };
 module.exports = {
   getCard, createCard, deleteCard, likeCard, dislikeCard,
