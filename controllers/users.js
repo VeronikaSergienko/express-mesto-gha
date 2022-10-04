@@ -5,7 +5,7 @@ const User = require('../models/user');
 const getUser = (req, res) => {
   User.find({})
     .then((user) => res.status(200).send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(() => res.status(500).send({ message: 'Ошибка по-умолчанию' }));
 };
 
 // POST /users — создаёт пользователя
@@ -23,7 +23,12 @@ const createUser = (req, res) => {
 const getUserId = (req, res) => {
   User.findById(req.params.userId)
     .then((user) => res.status(200).send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if (err.statusCode === 404) {
+        return res.status(404).send({ message: err.errorMessage });
+      }
+      return res.status(500).send({ message: 'Ошибка по-умолчанию' });
+    });
 };
 
 // PATCH /users/me — обновляет профиль
@@ -32,7 +37,7 @@ const patchUserId = (req, res) => {
   const ownerId = req.user._id;
   User.findByIdAndUpdate(ownerId, { name, about, avatar })
     .then((user) => res.status(200).send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(() => res.status(500).send({ message: 'Ошибка по-умолчанию' }));
 };
 
 // PATCH /users/me/avatar — обновляет аватар
@@ -41,7 +46,7 @@ const patchUserAvatar = (req, res) => {
   const ownerId = req.user._id;
   User.findByIdAndUpdate(ownerId, { avatar: newAvatar })
     .then((user) => res.status(200).send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(() => res.status(500).send({ message: 'Ошибка по-умолчанию' }));
 };
 
 module.exports = {
