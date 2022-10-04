@@ -48,8 +48,17 @@ const patchUserId = (req, res) => {
   const { name, about, avatar } = req.body;
   const ownerId = req.user._id;
   User.findByIdAndUpdate(ownerId, { name, about, avatar })
+    .orFail(new NotFound('Пользователь не найден'))
     .then((user) => res.status(200).send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Ошибка по-умолчанию' }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      } else if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Пользователь по указанному _id не найден' });
+      } else {
+        res.status(500).send({ message: 'Ошибка по-умолчанию' });
+      }
+    });
 };
 
 // PATCH /users/me/avatar — обновляет аватар
@@ -57,8 +66,17 @@ const patchUserAvatar = (req, res) => {
   const newAvatar = req.body.avatar;
   const ownerId = req.user._id;
   User.findByIdAndUpdate(ownerId, { avatar: newAvatar })
+    .orFail(new NotFound('Пользователь не найден'))
     .then((user) => res.status(200).send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Ошибка по-умолчанию' }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      } else if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Пользователь по указанному _id не найден' });
+      } else {
+        res.status(500).send({ message: 'Ошибка по-умолчанию' });
+      }
+    });
 };
 
 module.exports = {
