@@ -28,7 +28,7 @@ const createCard = (req, res) => {
 const deleteCard = (req, res) => {
   Cards.findByIdAndRemove(req.params.cardId)
     .then((card) => res.status(200).send({ data: card }))
-    .catch(() => res.status(404).send({ message: 'Карточка с указанным _id не найдена.' }));
+    .catch(() => res.status(400).send({ message: 'Карточка с указанным _id не найдена.' }));
 };
 
 // PUT /cards/:cardId/likes — поставить лайк карточке
@@ -42,7 +42,7 @@ const likeCard = (req, res) => {
     .then((card) => res.status(200).send({ data: card }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
+        res.status(400).send({ message: 'Передан несуществующий _id карточки.' });
       } else if (!!err.status && err.status === 404) {
         res.status(err.status).send({ message: err.message });
       } else {
