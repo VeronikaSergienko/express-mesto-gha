@@ -1,5 +1,7 @@
-const NotFoundErrorStatus = '404';
-const ValidationErrorStatus = '400';
+const notFoundErrorStatus = '404';
+const validationErrorStatus = '400';
+const serverError = '500';
 
-module.exports = NotFoundErrorStatus;
-module.exports = ValidationErrorStatus;
+module.exports = notFoundErrorStatus;
+module.exports = validationErrorStatus;
+module.exports = serverError;
