@@ -1,5 +1,5 @@
-const notFoundErrorStatus = '404';
+const NOT_FOUND_ERROR_CODE = '404';
 const BAD_DATA_CODE = '400';
-const serverError = '500';
+const SERVER_ERROR_CODE = '500';
 
-module.exports = { notFoundErrorStatus, BAD_DATA_CODE, serverError };
+module.exports = { NOT_FOUND_ERROR_CODE, BAD_DATA_CODE, SERVER_ERROR_CODE };

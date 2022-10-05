@@ -1,12 +1,12 @@
 const User = require('../models/user');
 const NotFound = require('../errors/NotFound');
-const { notFoundErrorStatus, BAD_DATA_CODE, serverError } = require('../utils/constants');
+const { NOT_FOUND_ERROR_CODE, BAD_DATA_CODE, SERVER_ERROR_CODE } = require('../utils/constants');
 
 // GET /users — возвращает всех пользователей
 const getUser = (req, res) => {
   User.find({})
     .then((user) => res.send({ data: user }))
-    .catch(() => res.status(serverError).send({ message: 'Ошибка по-умолчанию' }));
+    .catch(() => res.status(SERVER_ERROR_CODE).send({ message: 'Ошибка по-умолчанию' }));
 };
 
 // POST /users — создаёт пользователя
@@ -20,7 +20,7 @@ const createUser = (req, res) => {
       if (err.name === 'ValidationError') {
         res.status(BAD_DATA_CODE).send({ message: 'Переданы некорректные данные при создании пользователя.' });
       } else {
-        res.status(serverError).send({ message: 'На сервере произошла ошибка' });
+        res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
@@ -36,7 +36,7 @@ const getUserId = (req, res) => {
       } else if (err.status === 404) {
         res.status(err.status).send({ message: err.message });
       } else {
-        res.status(serverError).send({ message: 'На сервере произошла ошибка' });
+        res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
@@ -54,9 +54,9 @@ const patchUserId = (req, res) => {
       } else if (err.name === 'CastError') {
         res.status(BAD_DATA_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
       } else if (err.status === 404) {
-        res.status(notFoundErrorStatus).send({ message: 'Пользователь не найден' });
+        res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Пользователь не найден' });
       } else {
-        res.status(serverError).send({ message: 'На сервере произошла ошибка' });
+        res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
@@ -74,9 +74,9 @@ const patchUserAvatar = (req, res) => {
       } else if (err.name === 'CastError') {
         res.status(BAD_DATA_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
       } else if (err.status === 404) {
-        res.status(notFoundErrorStatus).send({ message: 'Пользователь не найден' });
+        res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Пользователь не найден' });
       } else {
-        res.status(serverError).send({ message: 'На сервере произошла ошибка' });
+        res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
