@@ -1,7 +1,7 @@
 const User = require('../models/user');
 const NotFound = require('../errors/NotFound');
 const notFoundErrorStatus = require('../utils/constants');
-const validationErrorStatus = require('../utils/constants');
+const BAD_DATA_CODE = require('../utils/constants');
 const serverError = require('../utils/constants');
 
 // GET /users — возвращает всех пользователей
@@ -20,7 +20,7 @@ const createUser = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(validationErrorStatus).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+        res.status(BAD_DATA_CODE).send({ message: 'Переданы некорректные данные при создании пользователя.' });
       } else {
         res.status(serverError).send({ message: 'На сервере произошла ошибка' });
       }
@@ -34,7 +34,7 @@ const getUserId = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(validationErrorStatus).send({ message: 'Передан некорректный _id' });
+        res.status(BAD_DATA_CODE).send({ message: 'Передан некорректный _id' });
       } else if (err.status === 404) {
         res.status(err.status).send({ message: err.message });
       } else {
@@ -52,9 +52,9 @@ const patchUserId = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(validationErrorStatus).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
+        res.status(BAD_DATA_CODE).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
       } else if (err.name === 'CastError') {
-        res.status(validationErrorStatus).send({ message: 'Пользователь с указанным _id не найден.' });
+        res.status(BAD_DATA_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
       } else if (err.status === 404) {
         res.status(notFoundErrorStatus).send({ message: 'Пользователь не найден' });
       } else {
@@ -72,9 +72,9 @@ const patchUserAvatar = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(validationErrorStatus).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
+        res.status(BAD_DATA_CODE).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
       } else if (err.name === 'CastError') {
-        res.status(validationErrorStatus).send({ message: 'Пользователь с указанным _id не найден.' });
+        res.status(BAD_DATA_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
       } else if (err.status === 404) {
         res.status(notFoundErrorStatus).send({ message: 'Пользователь не найден' });
       } else {
