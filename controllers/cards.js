@@ -1,6 +1,7 @@
 /* eslint-disable no-param-reassign, no-underscore-dangle */
 const Cards = require('../models/card');
 const NotFound = require('../errors/NotFound');
+const ValidationError = require('../errors/ValidationError');
 
 // GET /cards — возвращает все карточки
 const getCard = (req, res) => {
@@ -14,10 +15,11 @@ const createCard = (req, res) => {
   const { name, link } = req.body;
   const ownerId = req.user._id;
   Cards.create({ name, link, owner: ownerId })
+    .orFail(new ValidationError('Переданы некорректные данные при создании карточки'))
     .then((card) => res.status(200).send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные при создании карточки' });
+        res.status(err.status).send({ message: err.message });
       } else {
         res.status(500).send({ message: 'На сервере произошла ошибка' });
       }
