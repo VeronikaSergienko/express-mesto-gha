@@ -1,8 +1,6 @@
 const User = require('../models/user');
 const NotFound = require('../errors/NotFound');
-const notFoundErrorStatus = require('../utils/constants');
-const BAD_DATA_CODE = require('../utils/constants');
-const serverError = require('../utils/constants');
+const { notFoundErrorStatus, BAD_DATA_CODE, serverError } = require('../utils/constants');
 
 // GET /users — возвращает всех пользователей
 const getUser = (req, res) => {
