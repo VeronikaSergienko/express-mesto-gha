@@ -1,6 +1,7 @@
 /* eslint-disable no-param-reassign, no-underscore-dangle */
 const User = require('../models/user');
 const NotFound = require('../errors/NotFound');
+const NotFoundErrorStatus = require('../utils/constants');
 
 // GET /users — возвращает всех пользователей
 const getUser = (req, res) => {
@@ -54,7 +55,7 @@ const patchUserId = (req, res) => {
       } else if (err.name === 'CastError') {
         res.status(400).send({ message: 'Пользователь с указанным _id не найден.' });
       } else if (err.status === 404) {
-        res.status(404).send({ message: 'Пользователь не найден' });
+        res.status(NotFoundErrorStatus).send({ message: 'Пользователь не найден' });
       } else {
         res.status(500).send({ message: 'На сервере произошла ошибка' });
       }
@@ -74,7 +75,7 @@ const patchUserAvatar = (req, res) => {
       } else if (err.name === 'CastError') {
         res.status(400).send({ message: 'Пользователь с указанным _id не найден.' });
       } else if (err.status === 404) {
-        res.status(404).send({ message: 'Пользователь не найден' });
+        res.status(NotFoundErrorStatus).send({ message: 'Пользователь не найден' });
       } else {
         res.status(500).send({ message: 'На сервере произошла ошибка' });
       }

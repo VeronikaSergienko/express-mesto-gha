@@ -1,6 +1,7 @@
 /* eslint-disable no-param-reassign, no-underscore-dangle */
 const Cards = require('../models/card');
 const NotFound = require('../errors/NotFound');
+const ValidationErrorStatus = require('../utils/constants');
 
 // GET /cards — возвращает все карточки
 const getCard = (req, res) => {
@@ -17,7 +18,7 @@ const createCard = (req, res) => {
     .then((card) => res.status(200).send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные при создании карточки' });
+        res.status(ValidationErrorStatus).send({ message: 'Переданы некорректные данные при создании карточки' });
       } else {
         res.status(500).send({ message: 'На сервере произошла ошибка' });
       }
@@ -31,7 +32,7 @@ const deleteCard = (req, res) => {
     .then((card) => res.status(200).send({ data: card }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Передан некорректный _id' });
+        res.status(ValidationErrorStatus).send({ message: 'Передан некорректный _id' });
       } else if (err.status === 404) {
         res.status(err.status).send({ message: err.message });
       } else {
@@ -51,7 +52,7 @@ const likeCard = (req, res) => {
     .then((card) => res.status(200).send({ data: card }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Передан некорректный id.' });
+        res.status(ValidationErrorStatus).send({ message: 'Передан некорректный id.' });
       } else if (err.status === 404) {
         res.status(err.status).send({ message: err.message });
       } else {
@@ -71,7 +72,7 @@ const dislikeCard = (req, res) => {
     .then((card) => res.status(200).send({ data: card }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Передан некорректный id.' });
+        res.status(ValidationErrorStatus).send({ message: 'Передан некорректный id.' });
       } else if (err.status === 404) {
         res.status(err.status).send({ message: err.message });
       } else {
