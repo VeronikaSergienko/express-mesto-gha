@@ -1,6 +1,6 @@
 const Cards = require('../models/card');
 const NotFound = require('../errors/NotFound');
-const validationErrorStatus = require('../utils/constants');
+const BAD_DATA_CODE = require('../utils/constants');
 const serverError = require('../utils/constants');
 
 // GET /cards — возвращает все карточки
@@ -18,7 +18,7 @@ const createCard = (req, res) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(validationErrorStatus).send({ message: 'Переданы некорректные данные при создании карточки' });
+        res.status(BAD_DATA_CODE).send({ message: 'Переданы некорректные данные при создании карточки' });
       } else {
         res.status(serverError).send({ message: 'На сервере произошла ошибка' });
       }
@@ -32,7 +32,7 @@ const deleteCard = (req, res) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(validationErrorStatus).send({ message: 'Передан некорректный _id' });
+        res.status(BAD_DATA_CODE).send({ message: 'Передан некорректный _id' });
       } else if (err.status === 404) {
         res.status(err.status).send({ message: err.message });
       } else {
@@ -52,7 +52,7 @@ const likeCard = (req, res) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(validationErrorStatus).send({ message: 'Передан некорректный id.' });
+        res.status(BAD_DATA_CODE).send({ message: 'Передан некорректный id.' });
       } else if (err.status === 404) {
         res.status(err.status).send({ message: err.message });
       } else {
@@ -72,7 +72,7 @@ const dislikeCard = (req, res) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(validationErrorStatus).send({ message: 'Передан некорректный id.' });
+        res.status(BAD_DATA_CODE).send({ message: 'Передан некорректный id.' });
       } else if (err.status === 404) {
         res.status(err.status).send({ message: err.message });
       } else {
