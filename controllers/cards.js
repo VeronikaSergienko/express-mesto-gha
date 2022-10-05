@@ -31,8 +31,8 @@ const deleteCard = (req, res) => {
     .then((card) => res.status(200).send({ data: card }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Карточка с указанным _id не найдена.' });
-      } else if (!!err.status && err.status === 404) {
+        res.status(400).send({ message: 'Передан некорректный _id' });
+      } else if (err.status === 404) {
         res.status(err.status).send({ message: err.message });
       } else {
         res.status(500).send({ message: 'На сервере произошла ошибка' });
@@ -47,12 +47,12 @@ const likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
     { new: true },
   )
-    .orFail(new NotFound('Переданы некорректные данные для постановки лайка.'))
+    .orFail(new NotFound('Карточка с указанным _id не найдена.'))
     .then((card) => res.status(200).send({ data: card }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Передан несуществующий _id карточки.' });
-      } else if (!!err.status && err.status === 404) {
+        res.status(400).send({ message: 'Передан некорректный id.' });
+      } else if (err.status === 404) {
         res.status(err.status).send({ message: err.message });
       } else {
         res.status(500).send({ message: 'На сервере произошла ошибка' });
@@ -67,12 +67,12 @@ const dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } }, // убрать _id из массива
     { new: true },
   )
-    .orFail(new NotFound('Переданы некорректные данные для снятия лайка.'))
+    .orFail(new NotFound('Карточка с указанным _id не найдена.'))
     .then((card) => res.status(200).send({ data: card }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Передан несуществующий _id карточки.' });
-      } else if (!!err.status && err.status === 404) {
+        res.status(400).send({ message: 'Передан некорректный id.' });
+      } else if (err.status === 404) {
         res.status(err.status).send({ message: err.message });
       } else {
         res.status(500).send({ message: 'На сервере произошла ошибка' });

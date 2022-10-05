@@ -32,8 +32,8 @@ const getUserId = (req, res) => {
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Пользователь по указанному _id не найден' });
-      } else if (!!err.status && err.status === 404) {
+        res.status(400).send({ message: 'Передан некорректный _id' });
+      } else if (err.status === 404) {
         res.status(err.status).send({ message: err.message });
       } else {
         res.status(500).send({ message: 'На сервере произошла ошибка' });
@@ -52,7 +52,9 @@ const patchUserId = (req, res) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
       } else if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
+        res.status(400).send({ message: 'Пользователь с указанным _id не найден.' });
+      } else if (err.status === 404) {
+        res.status(404).send({ message: 'Пользователь не найден' });
       } else {
         res.status(500).send({ message: 'На сервере произошла ошибка' });
       }
@@ -70,7 +72,9 @@ const patchUserAvatar = (req, res) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
       } else if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
+        res.status(400).send({ message: 'Пользователь с указанным _id не найден.' });
+      } else if (err.status === 404) {
+        res.status(404).send({ message: 'Пользователь не найден' });
       } else {
         res.status(500).send({ message: 'На сервере произошла ошибка' });
       }
