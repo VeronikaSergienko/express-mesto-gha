@@ -1,3 +1,5 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFound = require('../errors/NotFound');
 const { NOT_FOUND_ERROR_CODE, BAD_DATA_CODE, SERVER_ERROR_CODE } = require('../utils/constants');
@@ -12,9 +14,14 @@ const getUser = (req, res) => {
 // POST /users — создаёт пользователя
 const createUser = (req, res) => {
 // получим из объекта запроса имя и описание пользователя
-  const { name, about, avatar } = req.body;
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+  bcrypt.hash(password, 10);
   // создадим документ на основе пришедших данных
-  User.create({ name, about, avatar })
+  User.create({
+    name, about, avatar, email, password: bcrypt.hash,
+  })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -81,6 +88,48 @@ const patchUserAvatar = (req, res) => {
     });
 };
 
+const login = (req, res) => {
+  const { email, password } = req.body;
+  User.findOne({ email })
+    .then((user) => {
+      if (!user) {
+        return Promise.reject(new Error('Неправильные почта или пароль'));
+      }
+      return bcrypt.compare(password, user.password);
+    })
+    .then((matched) => {
+      if (!matched) {
+      // хеши не совпали — отклоняем промис
+        return Promise.reject(new Error('Неправильные почта или пароль'));
+      }
+      // аутентификация успешна
+      const token = jwt.sign({ _id: User._id }, 'super-strong-secret', { expiresIn: '7d' });
+      return res.send({ token });
+    })
+    .catch((err) => {
+      res
+        .status(401)
+        .send({ message: err.message });
+    });
+};
+
+// const login = (req, res) => {
+//   const { email, password } = req.body;
+//   User.findOne({ email })
+//     .orFail(new NotFound('Неправильные почта или пароль'))
+//     .then((user) => {
+//        return bcrypt.compare(password, user.password);
+//      }
+//     .then((matched) => {
+//       const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' });
+//       res.send({ token })})
+//     .catch((err) => {
+//        res
+//          .status(401)
+//          .send({ message: err.message });
+//     })
+// };
+
 module.exports = {
-  getUser, createUser, getUserId, patchUserId, patchUserAvatar,
+  getUser, createUser, getUserId, patchUserId, patchUserAvatar, login,
 };
