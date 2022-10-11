@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFound = require('../errors/NotFound');
+const AuthorizedError = require('../errors/AuthorizedError');
 const { NOT_FOUND_ERROR_CODE, BAD_DATA_CODE, SERVER_ERROR_CODE } = require('../utils/constants');
 
 // GET /users — возвращает всех пользователей
@@ -101,7 +102,7 @@ const patchUserAvatar = (req, res) => {
 };
 
 // POST /signin — логинит пользователя
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password) {
     return res.status(400).send({ message: 'Такого пользователя не существует' });
@@ -113,17 +114,13 @@ const login = (req, res) => {
       }
       bcrypt.compare(password, user.password, (err, isValidPassword) => {
         if (!isValidPassword) {
-          return res.status(401).send({ message: 'Пароль не верен' });
+          throw new AuthorizedError('Нет пользователя с таким id');
         }
         const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
         return res.status(200).send({ token });
       });
     })
-    .catch((err) => {
-      res
-        .status(401)
-        .send({ message: err.message });
-    });
+    .catch(next);
 };
 
 module.exports = {
