@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const { celebrate, Joi } = require('celebrate');
 const mongoose = require('mongoose');
 const path = require('path');
 const auth = require('./middlewares/auth');
@@ -26,8 +27,19 @@ app.use(express.static(path.join(__dirname, 'public')));
 // подключаемся к серверу mongo
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
-app.post('/signin', login);
-app.post('/signup', createUser);
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(4),
+  }),
+}), login);
+
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(4),
+  }),
+}), createUser);
 
 // авторизация
 app.use(auth);
