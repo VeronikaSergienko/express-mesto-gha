@@ -32,19 +32,16 @@ const createUser = (req, res) => {
 };
 
 // GET /users/me - возвращает информацию о текущем пользователе
-const getProfile = (req, res) => {
+const getProfile = (req, res, next) => {
   User.findById(req.params.userId)
     .orFail(new NotFound('Пользователь не найден'))
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(BAD_DATA_CODE).send({ message: 'Передан некорректный _id' });
-      } else if (err.status === 404) {
-        res.status(err.status).send({ message: err.message });
-      } else {
-        res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
+    .then((user) => {
+      if (!user) {
+        throw new NotFound('Нет пользователя с таким id');
       }
-    });
+      res.send({ data: user });
+    })
+    .catch(next);
 };
 
 // GET /users/:userId - возвращает пользователя по _id
@@ -109,51 +106,25 @@ const login = (req, res) => {
   if (!email || !password) {
     return res.status(400).send({ message: 'Такого пользователя не существует' });
   }
-  return User.findOne({ email }).then((user) => {
-    if (!user) {
-      return res.status(403).send({ message: 'Такого пользователя не существует' });
-    }
-    bcrypt.compare(password, user.password, (err, isValidPassword) => {
-      if (!isValidPassword) {
-        return res.status(401).send({ message: 'Пароль не верен' });
+  return User.findOne({ email }).select('+password')
+    .then((user) => {
+      if (!user) {
+        return res.status(403).send({ message: 'Такого пользователя не существует' });
       }
-      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
-      // const token = getJwt(user._id);
-      return res.status(200).send({ token });
-    });
-  })
+      bcrypt.compare(password, user.password, (err, isValidPassword) => {
+        if (!isValidPassword) {
+          return res.status(401).send({ message: 'Пароль не верен' });
+        }
+        const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+        return res.status(200).send({ token });
+      });
+    })
     .catch((err) => {
       res
         .status(401)
         .send({ message: err.message });
     });
 };
-
-// const login = (req, res) => {
-//   const { email, password } = req.body;
-
-//   User.findOne({ email })
-//     .then((user) => {
-//       if (!user) {
-//         return Promise.reject(new Error('Неправильные почта или пароль'));
-//       }
-
-//       return bcrypt.compare(password, user.password);
-//     })
-//     .then((matched) => {
-//       if (!matched) {
-//         // хеши не совпали — отклоняем промис
-//         return Promise.reject(new Error('Неправильные почта или пароль'));
-//       }
-//       // аутентификация успешна
-//       return res.send({ message: 'Всё верно!' });
-//     })
-//     .catch((err) => {
-//       res
-//         .status(401)
-//         .send({ message: err.message });
-//     });
-// };
 
 module.exports = {
   getUser, createUser, getUserId, patchUserId, patchUserAvatar, login, getProfile,
