@@ -6,10 +6,10 @@ const AuthorizedError = require('../errors/AuthorizedError');
 const { NOT_FOUND_ERROR_CODE, BAD_DATA_CODE, SERVER_ERROR_CODE } = require('../utils/constants');
 
 // GET /users — возвращает всех пользователей
-const getUser = (req, res) => {
+const getUser = (req, res, next) => {
   User.find({})
     .then((user) => res.send({ data: user }))
-    .catch(() => res.status(SERVER_ERROR_CODE).send({ message: 'Ошибка по-умолчанию' }));
+    .catch(next);
 };
 
 // POST /signup — создаёт пользователя
