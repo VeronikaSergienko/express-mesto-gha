@@ -85,15 +85,6 @@ const patchUserAvatar = (req, res, next) => {
     .orFail(new NotFound('Пользователь не найден'))
     .then((user) => res.send({ data: user }))
     .catch(next);
-  // if (err.name === 'ValidationError') {
-  // status(BAD_DATA_CODE).send({ message: 'Переданы некорректные данные при обновлении аватара.' })
-  // } else if (err.name === 'CastError') {
-  //   res.status(BAD_DATA_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
-  // } else if (err.status === 404) {
-  //   res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Пользователь не найден' });
-  // } else {
-  //   res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
-  // }
 };
 
 // POST /signin — логинит пользователя
