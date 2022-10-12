@@ -9,9 +9,6 @@ router.post('/', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).required(true),
     link: Joi.string().required(true),
-    owner: Joi.object().required(true),
-    likes: Joi.object().required(true),
-    createdAt: Joi.date().required(false),
   }),
 }), createCard);
 router.delete('/:cardId', celebrate({
