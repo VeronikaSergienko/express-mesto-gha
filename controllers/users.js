@@ -33,7 +33,7 @@ const createUser = (req, res, next) => {
 
 // GET /users/me - возвращает информацию о текущем пользователе
 const getProfile = (req, res, next) => {
-  User.findById(req.params.userId)
+  User.findById(req.user._id)
     .orFail(new NotFound('Пользователь не найден'))
     .then((user) => {
       if (!user) {
@@ -45,19 +45,16 @@ const getProfile = (req, res, next) => {
 };
 
 // GET /users/:userId - возвращает пользователя по _id
-const getUserId = (req, res) => {
+const getUserId = (req, res, next) => {
   User.findById(req.params.userId)
     .orFail(new NotFound('Пользователь не найден'))
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(BAD_DATA_CODE).send({ message: 'Передан некорректный _id' });
-      } else if (err.status === 404) {
-        res.status(err.status).send({ message: err.message });
-      } else {
-        res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
+    .then((user) => {
+      if (!user) {
+        throw new NotFound('Нет пользователя с таким id');
       }
-    });
+      res.send({ data: user });
+    })
+    .catch(next);
 };
 
 // PATCH /users/me — обновляет профиль
@@ -81,23 +78,22 @@ const patchUserId = (req, res) => {
 };
 
 // PATCH /users/me/avatar — обновляет аватар
-const patchUserAvatar = (req, res) => {
+const patchUserAvatar = (req, res, next) => {
   const newAvatar = req.body.avatar;
   const ownerId = req.user._id;
   User.findByIdAndUpdate(ownerId, { avatar: newAvatar }, { new: true, runValidators: true })
     .orFail(new NotFound('Пользователь не найден'))
     .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(BAD_DATA_CODE).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
-      } else if (err.name === 'CastError') {
-        res.status(BAD_DATA_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
-      } else if (err.status === 404) {
-        res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Пользователь не найден' });
-      } else {
-        res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
-      }
-    });
+    .catch(next);
+  // if (err.name === 'ValidationError') {
+  // status(BAD_DATA_CODE).send({ message: 'Переданы некорректные данные при обновлении аватара.' })
+  // } else if (err.name === 'CastError') {
+  //   res.status(BAD_DATA_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
+  // } else if (err.status === 404) {
+  //   res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Пользователь не найден' });
+  // } else {
+  //   res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
+  // }
 };
 
 // POST /signin — логинит пользователя
