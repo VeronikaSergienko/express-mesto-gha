@@ -3,7 +3,7 @@ class AuthorizedError extends Error {
     super(message);
     this.name = 'NotFound';
     this.message = message;
-    this.status = 401;
+    this.statusCode = 401;
   }
 }
 
