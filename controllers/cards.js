@@ -10,18 +10,17 @@ const getCard = (req, res) => {
 };
 
 // POST /cards — создаёт карточку
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
   const ownerId = req.user._id;
   Cards.create({ name, link, owner: ownerId })
-    .then((card) => res.send({ data: card }))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(BAD_DATA_CODE).send({ message: 'Переданы некорректные данные при создании карточки' });
-      } else {
-        res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
+    .then((card) => {
+      if (!card) {
+        throw new NotFound('Карточка с указанным _id не найдена.');
       }
-    });
+      res.send({ data: card });
+    })
+    .catch(next);
 };
 
 // DELETE /cards/:cardId — удаляет карточку по идентификатору
