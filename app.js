@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { celebrate, Joi } = require('celebrate');
+const { errors } = require('celebrate');
 const mongoose = require('mongoose');
 const path = require('path');
 const auth = require('./middlewares/auth');
@@ -36,9 +37,9 @@ app.post('/signin', celebrate({
 
 app.post('/signup', celebrate({
   body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
+    name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().required().min().max(),
+    avatar: Joi.string(),
     email: Joi.string().required().email(),
     password: Joi.string().required().min(4),
   }),
@@ -53,6 +54,9 @@ app.use('/cards', require('./routes/cards'));
 app.use('/*', (req, res) => {
   res.status(404).json({ message: 'Запрашиваемый ресурс не найден' });
 });
+
+// обработчики ошибок
+app.use(errors()); // обработчик ошибок celebrate
 
 app.use((err, req, res, next) => {
   // если у ошибки нет статуса, выставляем 500

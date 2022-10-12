@@ -13,7 +13,7 @@ const getUser = (req, res) => {
 };
 
 // POST /signup — создаёт пользователя
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   bcrypt.hash(req.body.password, 10)
     .then((hash) => User.create({
       name: req.body.name,
@@ -22,14 +22,13 @@ const createUser = (req, res) => {
       email: req.body.email,
       password: hash,
     }))
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(BAD_DATA_CODE).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-      } else {
-        res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
+    .then((user) => {
+      if (!user) {
+        throw new NotFound('Переданы некорректные данные при создании пользователя.');
       }
-    });
+      res.send({ data: user });
+    })
+    .catch(next);
 };
 
 // GET /users/me - возвращает информацию о текущем пользователе
@@ -105,16 +104,16 @@ const patchUserAvatar = (req, res) => {
 const login = (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    return res.status(400).send({ message: 'Такого пользователя не существует' });
+    throw new AuthorizedError({ message: 'Передан неверный логин или пароль' });
   }
   return User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        return res.status(403).send({ message: 'Такого пользователя не существует' });
+        throw new AuthorizedError({ message: 'Передан неверный логин или пароль' });
       }
       bcrypt.compare(password, user.password, (err, isValidPassword) => {
         if (!isValidPassword) {
-          throw new AuthorizedError('Нет пользователя с таким id');
+          throw new AuthorizedError('Передан неверный логин или пароль');
         }
         const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
         return res.status(200).send({ token });
