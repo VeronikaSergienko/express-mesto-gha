@@ -1,5 +1,6 @@
 const Cards = require('../models/card');
 const NotFound = require('../errors/NotFound');
+const ForbiddenError = require('../errors/ForbiddenError');
 // const { BAD_DATA_CODE, SERVER_ERROR_CODE } = require('../utils/constants');
 
 // GET /cards — возвращает все карточки
@@ -25,13 +26,16 @@ const createCard = (req, res, next) => {
 
 // DELETE /cards/:cardId — удаляет карточку по идентификатору
 const deleteCard = (req, res, next) => {
+  const ownerId = req.user._id;
   Cards.findByIdAndRemove(req.params.cardId)
-    .orFail(new NotFound('Карточка с указанным _id не найдена.'))
     .then((card) => {
-      if (!card) {
-        throw new NotFound('Карточка с указанным _id не найдена.');
+      if (card) {
+        if (ownerId === card.owner.id) {
+          res.send({ data: card });
+        }
+        throw new ForbiddenError('Карточку может удалять только владелец карточки.');
       }
-      res.send({ data: card });
+      throw new NotFound('Карточка с указанным _id не найдена.');
     })
     .catch(next);
 };
