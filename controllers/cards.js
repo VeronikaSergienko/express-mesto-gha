@@ -34,8 +34,8 @@ const deleteCard = (req, res, next) => {
   Cards.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (card) {
-        if (ownerId === card.owner.id) {
-          res.send({ data: card });
+        if (ownerId === card.owner._id.toString()) {
+          res.status(200).send({ message: 'Карточка успешно удалена' });
         }
         throw new ForbiddenError('Карточку может удалять только владелец карточки.');
       }

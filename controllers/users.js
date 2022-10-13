@@ -22,11 +22,15 @@ const createUser = (req, res, next) => {
       email: req.body.email,
       password: hash,
     }))
-    .then((user) => {
-      if (!user) {
-        throw new NotFound('Переданы некорректные данные при создании пользователя.');
-      }
-      res.send({ data: user });
+    .then(({
+      name, about, _id, avatar, createdAt, email,
+    }) => {
+      // if (!user) {
+      //   throw new NotFound('Переданы некорректные данные при создании пользователя.');
+      // }
+      res.send({
+        name, about, _id, avatar, createdAt, email,
+      });
     })
     .catch(next);
 };
