@@ -25,9 +25,6 @@ const createUser = (req, res, next) => {
     .then(({
       name, about, _id, avatar, createdAt, email,
     }) => {
-      // if (!user) {
-      //   throw new NotFound('Переданы некорректные данные при создании пользователя.');
-      // }
       res.send({
         name, about, _id, avatar, createdAt, email,
       });

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-// const regexp = /^(https?:\/\/)?([\w]{1,32}\.[\w]{1,32})[^]*$/gm;
+
+const regexp = /^(https?:\/\/)?([\w]{1,32}\.[\w]{1,32})[^]*$/gm;
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -18,11 +19,11 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String,
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
-    // validate: {
-    //   validator(value) {
-    //     return /^(https?:\/\/)?([\w]{1,32}\.[\w]{1,32})[^]*$/.test(value);
-    //   },
-    // },
+    validate: {
+      validator: (value) => regexp.test(value),
+      message: ({ value }) => `${value} - некорректная ссылка`,
+    },
+    required: [true, 'User phone number required'],
   },
   email: {
     type: String,
@@ -42,3 +43,13 @@ const userSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('user', userSchema);
+
+// function isValidURL(url) => {
+//   const RegExp = /^(https?:\/\/)?([\w]{1,32}\.[\w]{1,32})[^]*$/;
+
+//   if(RegExp.test(url)){
+//       return true;
+//   }else{
+//       return false;
+//   }
+// }
