@@ -32,6 +32,7 @@ const createCard = (req, res, next) => {
 const deleteCard = (req, res, next) => {
   const ownerId = req.user._id;
   Cards.findByIdAndRemove(req.params.cardId)
+    .orFail(new NotFound('Карточка не найдена'))
     .then((card) => {
       if (card) {
         if (ownerId === card.owner._id.toString()) {
@@ -51,6 +52,7 @@ const likeCard = (req, res, next) => {
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
     { new: true },
   )
+    .orFail(new NotFound('Карточка не найдена'))
     .then((card) => {
       if (!card) {
         throw new NotFound('Карточка с указанным _id не найдена.');
@@ -67,6 +69,7 @@ const dislikeCard = (req, res, next) => {
     { $pull: { likes: req.user._id } }, // убрать _id из массива
     { new: true },
   )
+    .orFail(new NotFound('Карточка не найдена'))
     .then((card) => {
       if (!card) {
         throw new NotFound('Карточка с указанным _id не найдена.');
