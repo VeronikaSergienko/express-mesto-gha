@@ -31,16 +31,15 @@ const createCard = (req, res, next) => {
 // DELETE /cards/:cardId — удаляет карточку по идентификатору
 const deleteCard = (req, res, next) => {
   const ownerId = req.user._id;
-  Cards.findByIdAndRemove(req.params.cardId)
+  Cards.findById(req.params.cardId)
     .orFail(new NotFound('Карточка не найдена'))
     .then((card) => {
-      if (card) {
-        if (ownerId === card.owner._id.toString()) {
-          res.status(200).send({ message: 'Карточка успешно удалена' });
-        }
+      if (ownerId === card.owner._id.toString()) {
+        card.delete();
+        res.status(200).send({ message: 'Карточка успешно удалена' });
+      } else {
         throw new ForbiddenError('Карточку может удалять только владелец карточки.');
       }
-      throw new NotFound('Карточка с указанным _id не найдена.');
     })
     .catch(next);
 };
