@@ -54,6 +54,17 @@ app.use(errors()); // обработчик ошибок celebrate
 app.use((err, req, res, next) => {
   // если у ошибки нет статуса, выставляем 500
   const { statusCode = 500, message } = err;
+  if (statusCode === 400) {
+    res.status(400).send({ message: err.message });
+  } else if (statusCode === 401) {
+    res.status(401).send({ message: err.message });
+  } else if (statusCode === 403) {
+    res.status(403).send({ message: err.message });
+  } else if (statusCode === 11000) {
+    res.status(409).send({ message: err.message });
+  } else if (statusCode === 500) {
+    res.status(402).send({ message: err.message });
+  }
 
   res
     .status(statusCode)
@@ -65,5 +76,20 @@ app.use((err, req, res, next) => {
     });
   next();
 });
+
+// app.use((err, req, res, next) => {
+//   // если у ошибки нет статуса, выставляем 500
+//   const { statusCode = 500, message } = err;
+
+//   res
+//     .status(statusCode)
+//     .send({
+//       // проверяем статус и выставляем сообщение в зависимости от него
+//       message: statusCode === 500
+//         ? 'На сервере произошла ошибка'
+//         : message,
+//     });
+//   next();
+// });
 
 app.listen(PORT);
