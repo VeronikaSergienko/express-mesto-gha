@@ -51,7 +51,9 @@ const getProfile = (req, res, next) => {
 // GET /users/:userId - возвращает пользователя по _id
 const getUserId = (req, res, next) => {
   User.findById(req.params.userId)
-    .orFail(new NotFound('Пользователь не найден'))
+    .orFail(() => {
+      throw ValidationError('Нет пользователя с таким id');
+    })
     .then((user) => {
       if (!user) {
         throw new NotFound('Нет пользователя с таким id');
