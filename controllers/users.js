@@ -5,6 +5,7 @@ const NotFound = require('../errors/NotFound');
 const AuthorizedError = require('../errors/AuthorizedError');
 // const ValidationError = require('../errors/AuthorizedError');
 const { NOT_FOUND_ERROR_CODE, BAD_DATA_CODE, SERVER_ERROR_CODE } = require('../utils/constants');
+const ValidationError = require('../errors/ValidationError');
 
 // GET /users — возвращает всех пользователей
 const getUser = (req, res, next) => {
@@ -34,23 +35,17 @@ const createUser = (req, res, next) => {
 };
 
 // GET /users/me - возвращает информацию о текущем пользователе
-const getProfile = (req, res) => {
-  User.findById(req.user._id)
-    // .orFail(new NotFound('Пользователь не найден'))
-    .then((user) => res.send({ data: user }))
-    // .then((user) => {
-    //   if (user) {
-    //     res.send({ data: user });
-    //   }
-    //   throw new NotFound('Нет пользователя с таким id');
-    // })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(BAD_DATA_CODE).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
-      } else {
-        res.status(SERVER_ERROR_CODE).send({ message: 'что-то другое' });
+const getProfile = (req, res, next) => {
+  const ownerId = req.user._id;
+  User.findById(ownerId)
+    .orFail(new NotFound('Пользователь не найден'))
+    .then((user) => {
+      if (!user) {
+        throw new NotFound('Нет пользователя с таким id');
       }
-    });
+      res.send({ data: user });
+    })
+    .catch(next);
 };
 
 // GET /users/:userId - возвращает пользователя по _id
@@ -71,11 +66,11 @@ const patchUserId = (req, res) => {
   const { name, about, avatar } = req.body;
   const ownerId = req.user._id;
   User.findByIdAndUpdate(ownerId, { name, about, avatar }, { new: true, runValidators: true })
-    .orFail(new NotFound('Пользователь не найден'))
+    .orFail(new ValidationError('Пользователь не найден'))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(BAD_DATA_CODE).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
+        res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
       } else if (err.name === 'CastError') {
         res.status(BAD_DATA_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
       } else if (err.status === 404) {

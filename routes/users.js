@@ -6,11 +6,7 @@ const {
 } = require('../controllers/users');
 
 router.get('/', getUser);
-router.get('/:userId', celebrate({
-  params: Joi.object().keys({
-    userId: Joi.string().alphanum(),
-  }),
-}), getUserId);
+
 router.get('/me', getProfile);
 router.patch('/me', celebrate({
   body: Joi.object().keys({
@@ -20,5 +16,10 @@ router.patch('/me', celebrate({
   }),
 }), patchUserId);
 router.patch('/me/avatar', patchUserAvatar);
+router.get('/:userId', celebrate({
+  params: Joi.object().keys({
+    userId: Joi.string().alphanum(),
+  }),
+}), getUserId);
 
 module.exports = router;
