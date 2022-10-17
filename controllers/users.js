@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFound = require('../errors/NotFound');
 const AuthorizedError = require('../errors/AuthorizedError');
+// const ValidationError = require('../errors/AuthorizedError');
 const { NOT_FOUND_ERROR_CODE, BAD_DATA_CODE, SERVER_ERROR_CODE } = require('../utils/constants');
 
 // GET /users — возвращает всех пользователей
