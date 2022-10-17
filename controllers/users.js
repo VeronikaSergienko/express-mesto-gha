@@ -34,16 +34,23 @@ const createUser = (req, res, next) => {
 };
 
 // GET /users/me - возвращает информацию о текущем пользователе
-const getProfile = (req, res, next) => {
+const getProfile = (req, res) => {
   User.findById(req.user._id)
-    .orFail(new NotFound('Пользователь не найден'))
-    .then((user) => {
-      if (!user) {
-        throw new NotFound('Нет пользователя с таким id');
+    // .orFail(new NotFound('Пользователь не найден'))
+    .then((user) => res.send({ data: user }))
+    // .then((user) => {
+    //   if (user) {
+    //     res.send({ data: user });
+    //   }
+    //   throw new NotFound('Нет пользователя с таким id');
+    // })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(BAD_DATA_CODE).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
+      } else {
+        res.status(SERVER_ERROR_CODE).send({ message: 'что-то другое' });
       }
-      res.send({ data: user });
-    })
-    .catch(next);
+    });
 };
 
 // GET /users/:userId - возвращает пользователя по _id

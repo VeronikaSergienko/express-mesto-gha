@@ -1,6 +1,5 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
-// .pattern(/^(https?:\/\/)?([\w]{1,32}\.[\w]{1,32})*$/gm)
 
 const {
   getUser, getUserId, patchUserId, patchUserAvatar, getProfile,
@@ -9,19 +8,15 @@ const {
 router.get('/', getUser);
 router.get('/:userId', celebrate({
   params: Joi.object().keys({
-    userId: Joi.string().alphanum().length(24),
+    userId: Joi.string().alphanum(),
   }),
 }), getUserId);
-router.get('/me', celebrate({
-  params: Joi.object().keys({
-    userId: Joi.string().alphanum().length(24),
-  }),
-}), getProfile);
+router.get('/me', getProfile);
 router.patch('/me', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required(false).min(2).max(30),
     about: Joi.string().required(false).min(2).max(30),
-    avatar: Joi.string().required(false),
+    avatar: Joi.string().required(false).regex(/http[s]?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*,]|(?:%[0-9a-fA-F][0-9aFA-F]))+/),
   }),
 }), patchUserId);
 router.patch('/me/avatar', patchUserAvatar);
