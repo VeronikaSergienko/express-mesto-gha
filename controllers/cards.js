@@ -1,7 +1,6 @@
 const Cards = require('../models/card');
 const NotFound = require('../errors/NotFound');
 const ForbiddenError = require('../errors/ForbiddenError');
-// const { BAD_DATA_CODE, SERVER_ERROR_CODE } = require('../utils/constants');
 
 // GET /cards — возвращает все карточки
 const getCard = (req, res, next) => {

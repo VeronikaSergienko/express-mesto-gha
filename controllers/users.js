@@ -31,8 +31,33 @@ const createUser = (req, res, next) => {
         name, about, _id, avatar, createdAt, email,
       });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.code === 11000) {
+        res.status(409).json({ message: 'Пользователь с таким email уже существует' });
+      } else {
+        next(err);
+      }
+    });
 };
+
+// const createUser = (req, res, next) => {
+//   bcrypt.hash(req.body.password, 10)
+//     .then((hash) => User.create({
+//       name: req.body.name,
+//       about: req.body.about,
+//       avatar: req.body.avatar,
+//       email: req.body.email,
+//       password: hash,
+//     }))
+//     .then(({
+//       name, about, _id, avatar, createdAt, email,
+//     }) => {
+//       res.send({
+//         name, about, _id, avatar, createdAt, email,
+//       });
+//     })
+//     .catch(next);
+// };
 
 // GET /users/me - возвращает информацию о текущем пользователе
 const getProfile = (req, res, next) => {
