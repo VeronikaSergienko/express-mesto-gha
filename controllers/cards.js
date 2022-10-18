@@ -34,11 +34,11 @@ const deleteCard = (req, res, next) => {
   Cards.findById(req.params.cardId)
     .orFail(new NotFound('Карточка не найдена'))
     .then((card) => {
-      if (ownerId === card.owner.toString()) {
-        card.delete()
-          .then(() => res.status(200).send({ message: 'Карточка успешно удалена' }));
-      } else {
-        throw new ForbiddenError('Карточку может удалять только владелец карточки.');
+      if (card) {
+        if (ownerId === card.owner.toString()) {
+          card.delete()
+            .then(() => res.status(200).json({ message: 'Карточка успешно удалена' }));
+        } else { throw new ForbiddenError('Карточку может удалять только владелец карточки.'); }
       }
     })
     .catch((err) => {
