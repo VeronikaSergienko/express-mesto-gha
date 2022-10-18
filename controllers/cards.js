@@ -34,14 +34,20 @@ const deleteCard = (req, res, next) => {
   Cards.findById(req.params.cardId)
     .orFail(new NotFound('Карточка не найдена'))
     .then((card) => {
-      if (ownerId === card.owner._id.toString()) {
-        card.delete();
-        res.status(200).send({ message: 'Карточка успешно удалена' });
+      if (ownerId === card.owner.toString()) {
+        card.delete()
+          .then(() => res.status(200).send({ message: 'Карточка успешно удалена' }));
       } else {
         throw new ForbiddenError('Карточку может удалять только владелец карточки.');
       }
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new NotFound('не корректный id'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 // PUT /cards/:cardId/likes — поставить лайк карточке
