@@ -3,8 +3,6 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFound = require('../errors/NotFound');
 const AuthorizedError = require('../errors/AuthorizedError');
-// const ValidationError = require('../errors/AuthorizedError');
-const { NOT_FOUND_ERROR_CODE, BAD_DATA_CODE, SERVER_ERROR_CODE } = require('../utils/constants');
 const ValidationError = require('../errors/ValidationError');
 
 // GET /users — возвращает всех пользователей
@@ -40,25 +38,6 @@ const createUser = (req, res, next) => {
     });
 };
 
-// const createUser = (req, res, next) => {
-//   bcrypt.hash(req.body.password, 10)
-//     .then((hash) => User.create({
-//       name: req.body.name,
-//       about: req.body.about,
-//       avatar: req.body.avatar,
-//       email: req.body.email,
-//       password: hash,
-//     }))
-//     .then(({
-//       name, about, _id, avatar, createdAt, email,
-//     }) => {
-//       res.send({
-//         name, about, _id, avatar, createdAt, email,
-//       });
-//     })
-//     .catch(next);
-// };
-
 // GET /users/me - возвращает информацию о текущем пользователе
 const getProfile = (req, res, next) => {
   const ownerId = req.user._id;
@@ -86,21 +65,17 @@ const getUserId = (req, res, next) => {
 };
 
 // PATCH /users/me — обновляет профиль
-const patchUserId = (req, res) => {
+const patchUserId = (req, res, next) => {
   const { name, about, avatar } = req.body;
   const ownerId = req.user._id;
   User.findByIdAndUpdate(ownerId, { name, about, avatar }, { new: true, runValidators: true })
     .orFail(new ValidationError('Пользователь не найден'))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
-      } else if (err.name === 'CastError') {
-        res.status(BAD_DATA_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
-      } else if (err.status === 404) {
-        res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Пользователь не найден' });
+      if (err.code === 11000) {
+        res.status(409).json({ message: 'Пользователь с таким email уже существует' });
       } else {
-        res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
+        next(err);
       }
     });
 };
