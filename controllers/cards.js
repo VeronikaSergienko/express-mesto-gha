@@ -6,9 +6,10 @@ const ForbiddenError = require('../errors/ForbiddenError');
 const getCard = (req, res, next) => {
   Cards.find({})
     .then((cards) => {
-      if (cards.length === 0) {
-        throw new NotFound('Карточки не найдены');
-      } res.send({ data: cards });
+      res.send({ data: cards });
+      // if (cards.length === 0) {
+      //   throw new NotFound('Карточки не найдены');
+      // } res.send({ data: cards });
     })
     .catch(next);
 };
@@ -31,6 +32,7 @@ const createCard = (req, res, next) => {
 const deleteCard = (req, res, next) => {
   const ownerId = req.user._id;
   Cards.findById(req.params.cardId)
+    .orFail(new NotFound('Карточка не найдена'))
     .then((card) => {
       if (card) {
         if (ownerId === card.owner.toString()) {
