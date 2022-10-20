@@ -32,6 +32,8 @@ const createUser = (req, res, next) => {
     .catch((err) => {
       if (err.code === 11000) {
         res.status(409).json({ message: 'Пользователь с таким email уже существует' });
+      } else if (err.name === 'ValidationError') {
+        next(new ValidationError('Переданы некорректные данные'));
       } else {
         next(err);
       }
@@ -61,19 +63,25 @@ const getUserId = (req, res, next) => {
       }
       res.send({ data: user });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new NotFound('Не корректный id'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 // PATCH /users/me — обновляет профиль
 const patchUserId = (req, res, next) => {
-  const { name, about, avatar } = req.body;
+  const { name, about } = req.body;
   const ownerId = req.user._id;
-  User.findByIdAndUpdate(ownerId, { name, about, avatar }, { new: true, runValidators: true })
-    .orFail(new ValidationError('Пользователь не найден'))
+  User.findByIdAndUpdate(ownerId, { name, about }, { new: true, runValidators: true })
+    .orFail(new NotFound('Пользователь не найден'))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.code === 11000) {
-        res.status(409).json({ message: 'Пользователь с таким email уже существует' });
+      if (err.name === 'ValidationError') {
+        next(new ValidationError('Переданы некорректные данные'));
       } else {
         next(err);
       }
@@ -87,15 +95,18 @@ const patchUserAvatar = (req, res, next) => {
   User.findByIdAndUpdate(ownerId, { avatar: newAvatar }, { new: true, runValidators: true })
     .orFail(new NotFound('Пользователь не найден'))
     .then((user) => res.send({ data: user }))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new ValidationError('Переданы некорректные данные'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 // POST /signin — логинит пользователя
 const login = (req, res, next) => {
   const { email, password } = req.body;
-  if (!email || !password) {
-    throw new AuthorizedError({ message: 'Передан неверный логин или пароль' });
-  }
   return User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
