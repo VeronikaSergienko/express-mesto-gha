@@ -1,6 +1,7 @@
 const Cards = require('../models/card');
 const NotFound = require('../errors/NotFound');
 const ForbiddenError = require('../errors/ForbiddenError');
+const ValidationError = require('../errors/ValidationError');
 
 // GET /cards — возвращает все карточки
 const getCard = (req, res, next) => {
@@ -22,7 +23,13 @@ const createCard = (req, res, next) => {
       }
       res.send({ data: card });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new ValidationError('Переданы некорректные данные'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 // DELETE /cards/:cardId — удаляет карточку по идентификатору
@@ -31,12 +38,10 @@ const deleteCard = (req, res, next) => {
   Cards.findById(req.params.cardId)
     .orFail(new NotFound('Карточка не найдена'))
     .then((card) => {
-      if (card) {
-        if (ownerId === card.owner.toString()) {
-          card.delete()
-            .then(() => res.status(200).json({ message: 'Карточка успешно удалена' }));
-        } else { throw new ForbiddenError('Карточку может удалять только владелец карточки.'); }
-      }
+      if (ownerId === card.owner.toString()) {
+        card.delete()
+          .then(() => res.status(200).json({ message: 'Карточка успешно удалена' }));
+      } else { throw new ForbiddenError('Карточку может удалять только владелец карточки.'); }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -56,12 +61,15 @@ const likeCard = (req, res, next) => {
   )
     .orFail(new NotFound('Карточка не найдена'))
     .then((card) => {
-      if (!card) {
-        throw new NotFound('Карточка с указанным _id не найдена.');
-      }
       res.send({ data: card });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new NotFound('Не корректный id'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 // DELETE /cards/:cardId/likes — убрать лайк с карточки
