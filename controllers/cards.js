@@ -7,9 +7,6 @@ const getCard = (req, res, next) => {
   Cards.find({})
     .then((cards) => {
       res.send({ data: cards });
-      // if (cards.length === 0) {
-      //   throw new NotFound('Карточки не найдены');
-      // } res.send({ data: cards });
     })
     .catch(next);
 };

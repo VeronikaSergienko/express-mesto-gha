@@ -1,7 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { celebrate, Joi, isCelebrateError } = require('celebrate');
-const { errors } = require('celebrate');
+const {
+  celebrate, Joi, isCelebrateError, errors,
+} = require('celebrate');
 const mongoose = require('mongoose');
 const path = require('path');
 const auth = require('./middlewares/auth');
@@ -24,7 +25,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb');
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(4),
+    password: Joi.string().required(),
   }),
 }), login);
 
@@ -34,7 +35,7 @@ app.post('/signup', celebrate({
     about: Joi.string().min(2).max(30),
     avatar: Joi.string().regex(/http[s]?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*,]|(?:%[0-9a-fA-F][0-9aFA-F]))+/),
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(4),
+    password: Joi.string().required(),
   }),
 }), createUser);
 
