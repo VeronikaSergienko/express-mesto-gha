@@ -73,12 +73,15 @@ const dislikeCard = (req, res, next) => {
   )
     .orFail(new NotFound('Карточка не найдена'))
     .then((card) => {
-      if (!card) {
-        throw new NotFound('Карточка с указанным _id не найдена.');
-      }
       res.send({ data: card });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new NotFound('Не корректный id'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports = {
