@@ -16,6 +16,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true,
 }));
+const NotFound = require('./errors/NotFound');
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -45,8 +46,8 @@ app.use(auth);
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
-app.use('/*', (req, res) => {
-  res.status(404).json({ message: 'Запрашиваемый ресурс не найден' });
+app.use('/*', (req, res, next) => {
+  next(new NotFound('Запрашиваемый ресурс не найден'));
 });
 
 // обработчики ошибок
