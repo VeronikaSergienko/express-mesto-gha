@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const {
-  celebrate, Joi, isCelebrateError, errors,
+  celebrate, Joi, errors,
 } = require('celebrate');
 const mongoose = require('mongoose');
 const path = require('path');
@@ -11,6 +11,8 @@ const {
 } = require('./controllers/users');
 
 const { regExpURL } = require('./utils/constants');
+
+const { errorsHandler } = require('./middlewares/errorsHandler');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -55,15 +57,6 @@ app.use('/*', (req, res, next) => {
 // обработчики ошибок
 app.use(errors()); // обработчик ошибок celebrate
 
-app.use((err, req, res, next) => {
-  // если у ошибки нет статуса, выставляем 500
-  const { statusCode = 500, message } = err;
-  if (isCelebrateError(err)) {
-    res.status(statusCode).json(err);
-  } else {
-    res.status(statusCode).json({ message: statusCode === 500 ? 'На сервере произошла ошибка' : message });
-  }
-  next();
-});
+app.use(errorsHandler);
 
 app.listen(PORT);
