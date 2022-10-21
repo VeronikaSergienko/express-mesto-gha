@@ -40,13 +40,3 @@ const userSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('user', userSchema);
-
-// function isValidURL(url) => {
-//   const RegExp = /^(https?:\/\/)?([\w]{1,32}\.[\w]{1,32})[^]*$/;
-
-//   if(RegExp.test(url)){
-//       return true;
-//   }else{
-//       return false;
-//   }
-// }
