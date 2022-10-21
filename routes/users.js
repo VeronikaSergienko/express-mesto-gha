@@ -5,6 +5,8 @@ const {
   getUser, getUserId, patchUserId, patchUserAvatar, getProfile,
 } = require('../controllers/users');
 
+const regExpURL = require('../utils/constants');
+
 router.get('/', getUser);
 
 router.get('/me', getProfile);
@@ -16,7 +18,7 @@ router.patch('/me', celebrate({
 }), patchUserId);
 router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().regex(/http[s]?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*,]|(?:%[0-9a-fA-F][0-9aFA-F]))+/),
+    avatar: Joi.string().regex(regExpURL),
   }),
 }), patchUserAvatar);
 router.get('/:userId', celebrate({

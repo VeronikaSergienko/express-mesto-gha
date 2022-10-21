@@ -1,5 +1,5 @@
-const NOT_FOUND_ERROR_CODE = 404;
-const BAD_DATA_CODE = 400;
-const SERVER_ERROR_CODE = 500;
+const regExpURL = /http[s]?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*,]|(?:%[0-9a-fA-F][0-9aFA-F]))+/;
 
-module.exports = { NOT_FOUND_ERROR_CODE, BAD_DATA_CODE, SERVER_ERROR_CODE };
+// /^https?:\/\/[\w\/?.&-=]+$/gi;
+
+module.exports = { regExpURL };
