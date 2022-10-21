@@ -1,3 +1,3 @@
-const regExpURL = /^https?:\/\/[\w/?.&-=]+$/gi;
+const regExpURL = /^https?:\/\/[\w/?.&-=]+$/;
 
 module.exports = { regExpURL };
