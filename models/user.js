@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 
-// const regexp = /^(https?:\/\/)?([\w]{1,32}\.[\w]{1,32})*$/gm;
-
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
